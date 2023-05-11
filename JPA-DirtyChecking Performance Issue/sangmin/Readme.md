@@ -1,7 +1,5 @@
 # JPA-DirtyChecking Performance Issue
 
-# ISSUE:: JPA-DirtyChecking Performance Issue
-
 영속성 컨텍스트의 변경감지(Dirty-Checking)기능을 사용할때 성능 저하가 발생함
 
 ## PS1
