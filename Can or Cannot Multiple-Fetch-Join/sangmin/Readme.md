@@ -1,4 +1,4 @@
-# ISSUE:: Can or Cannot Multiple-Fetch-Join
+# Can or Cannot Multiple-Fetch-Join
 
 다중 Fetch-Join을 사용할 수 있는 상황과 사용할 수 없는 상황에 대해 `MultipleBagFetchException` 예외 발생 여부로 치환하여 사용가능여부를 판단한다
 
