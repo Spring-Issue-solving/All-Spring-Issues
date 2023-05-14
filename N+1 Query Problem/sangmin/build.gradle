@@ -1,10 +1,20 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.7-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.1.0'
+
+	//Query dsl
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
-group = 'IssueSolving'
+group = 'sangmin'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
@@ -23,8 +33,15 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
+	//querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa:5.0.0'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
+
+
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -32,3 +49,20 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+//querydsl 추가 끝
