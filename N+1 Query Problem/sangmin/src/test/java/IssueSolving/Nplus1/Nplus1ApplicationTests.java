@@ -2,6 +2,10 @@ package IssueSolving.Nplus1;
 
 import IssueSolving.Nplus1.Entity.Contract;
 import IssueSolving.Nplus1.Entity.Member;
+import IssueSolving.Nplus1.Entity.QContract;
+import IssueSolving.Nplus1.Entity.QMember;
+import IssueSolving.Nplus1.QueryConuter.ApiQueryCounter;
+import IssueSolving.Nplus1.QueryConuter.ApiQueryInspector;
 import IssueSolving.Nplus1.Repository.ContractRepository;
 import IssueSolving.Nplus1.Repository.MemberRepository;
 
@@ -13,11 +17,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
@@ -31,12 +39,12 @@ class Nplus1ApplicationTests {
 
 	@PersistenceContext
 	EntityManager em;
-//	JPAQueryFactory queryFactory;
-//
-//	@BeforeEach
-//	public void before() {
-//		queryFactory = new JPAQueryFactory(em);
-//	}
+
+	JPAQueryFactory queryFactory;
+
+	@Autowired
+	private ApiQueryCounter apiQueryCounter;
+
 
 	@BeforeEach
 	public void setUp(){
@@ -57,6 +65,10 @@ class Nplus1ApplicationTests {
 			members.add(member);
 		}
 		memberRepository.saveAll(members);
+
+		// 쿼리카운트 초기화
+		apiQueryCounter.resetCount();
+
 		em.clear();
 	}
 	@Test
@@ -67,6 +79,7 @@ class Nplus1ApplicationTests {
 		List<Member> members = memberRepository.findAll();
 		System.out.println("========================================");
 
+		assertThat(apiQueryCounter.getCount()).isEqualTo(11);
 	}
 
 	@Test
@@ -81,6 +94,8 @@ class Nplus1ApplicationTests {
 				.flatMap(it -> it.getContracts().stream().map(contract -> contract.getName())).collect(Collectors.toList());
 		System.out.println("========================================");
 
+		assertThat(apiQueryCounter.getCount()).isEqualTo(11);
+
 	}
 
 
@@ -94,6 +109,8 @@ class Nplus1ApplicationTests {
 		List<Member> members = memberRepository.findAllJoinFetch();
 		System.out.println("========================================");
 
+		assertThat(apiQueryCounter.getCount()).isEqualTo(1);
+
 	}
 
 	@Test
@@ -103,6 +120,8 @@ class Nplus1ApplicationTests {
 		System.out.println("========================================");
 		List<Member> members = memberRepository.findAllEntityGraph();
 		System.out.println("========================================");
+
+		assertThat(apiQueryCounter.getCount()).isEqualTo(1);
 
 	}
 
@@ -114,32 +133,40 @@ class Nplus1ApplicationTests {
 		List<Member> members = memberRepository.findAll();
 		System.out.println("========================================");
 
+		assertThat(apiQueryCounter.getCount()).isEqualTo(2);
 	}
 
 	@Test
 	@Transactional
-	void prob_베치사이즈_Subselect() {
+	void prob_베치사이즈() {
 
 		System.out.println("========================================");
 		List<Member> members = memberRepository.findAll();
 		System.out.println("========================================");
 
+		//페치모드_subselect
+		assertThat(apiQueryCounter.getCount()).isEqualTo(3);
+
 	}
 
-//	@Test
-//	@Transactional
-//	void prob_쿼리빌더_QueryDSL() {
-//		QMember member = QMember.member;
-//		QContract contract = QContract.contract;
-//
-//		System.out.println("========================================");
-//		List<Member> members = queryFactory
-//				.select(member)
-//				.from(member).leftJoin(member.contracts, contract)
-//				.fetchJoin()
-//				.fetch();
-//		System.out.println("========================================");
-//
-//	}
+	@Test
+	@Transactional
+	void prob_쿼리빌더_QueryDSL() {
+		queryFactory = new JPAQueryFactory(em);
+
+		QMember member = QMember.member;
+		QContract contract = QContract.contract;
+
+		System.out.println("========================================");
+		List<Member> members = queryFactory
+				.select(member)
+				.from(member).leftJoin(member.contracts, contract)
+				.fetchJoin()
+				.fetch();
+		System.out.println("========================================");
+
+		assertThat(apiQueryCounter.getCount()).isEqualTo(1);
+	}
+
 
 }
