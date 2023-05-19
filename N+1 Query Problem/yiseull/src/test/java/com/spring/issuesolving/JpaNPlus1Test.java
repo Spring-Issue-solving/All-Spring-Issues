@@ -1,13 +1,14 @@
 package com.spring.issuesolving;
 
-import com.spring.issuesolving.JpaNPlus1.Artist;
-import com.spring.issuesolving.JpaNPlus1.ArtistRepository;
-import com.spring.issuesolving.JpaNPlus1.Song;
-import com.spring.issuesolving.JpaNPlus1.SongRepository;
+import com.spring.issuesolving.JpaNPlus1.entity.Artist;
+import com.spring.issuesolving.JpaNPlus1.repository.ArtistRepository;
+import com.spring.issuesolving.JpaNPlus1.entity.Song;
+import com.spring.issuesolving.JpaNPlus1.repository.SongRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,8 @@ public class JpaNPlus1Test {
     private ArtistRepository artistRepository;
     @Autowired
     private SongRepository songRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     public void setup() {
@@ -42,69 +45,152 @@ public class JpaNPlus1Test {
 
         Song song3 = Song.builder().title("Memories").artist(artist2).build();
         songRepository.save(song3);
+
+        entityManager.clear();
     }
 
+    @Nested
     @DisplayName("CASE 1. FetchType.EAGER")
-    @Test
-    @Transactional
-    void occurJpaNPlus1_EAGER() {
+    class EAGER {
 
-        // when - JPA N+1 문제 발생: 조회는 1번 했지만 조회 쿼리는 3번 실행
-        List<Artist> artists = artistRepository.findAll();
+        @DisplayName("N+1 문제 발생")
+        @Test
+        @Transactional
+        void occurJpaNPlus1_EAGER() {
 
-        // then
-        assertThat(artists.size()).isEqualTo(2);
-    }
+            // when - JPA N+1 문제 발생: 조회는 1번 했지만 조회 쿼리는 3번 실행
+            List<Artist> artists = artistRepository.findAll();
 
-    @DisplayName("CASE 2. FetchType.LAZY")
-    @Test
-    @Transactional
-    void occurJpaNPlus1_LAZY() {
-         // when
-        List<Artist> artists = artistRepository.findAll();
-        for (Artist artist : artists) {
-            System.out.println("================ N+1 problem occur ================");
-            System.out.println(artist.getName());
-            artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            // then
+            assertThat(artists.size()).isEqualTo(2);
         }
 
-        // then
-        assertThat(artists.size()).isEqualTo(2);
+        @DisplayName("해결방안 1. Fetch join")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_FetchJoin() {
+
+            // when
+            List<Artist> artists = artistRepository.findAllJoinFetch();
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
+
+        @DisplayName("해결방안 2. EntityGraph")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_EntityGraph() {
+
+            // when
+            List<Artist> artists = artistRepository.findAllEntityGraph();
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
+
+        @DisplayName("해결방안 3. FetchMode.SUBSELECT")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_SUBSELECT() {
+
+            // when
+            List<Artist> artists = artistRepository.findAll();
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
+
+        @DisplayName("해결방안 4. BatchSize")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_BATCHSIZE() {
+
+            // when
+            List<Artist> artists = artistRepository.findAll();
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
     }
 
-    @DisplayName("해결방안 1. Fetch join")
-    @Test
-    @Transactional
-    void solveJpaNPlus1_FetchJoin() {
+    @Nested
+    @DisplayName("CASE 2. FetchType.LAZY")
+    class LAZY {
 
-        // when
-        List<Artist> artists = artistRepository.findAllJoinFetch();
+        @DisplayName("N+1 문제 발생")
+        @Test
+        @Transactional
+        void occurJpaNPlus1_LAZY() {
+            // when
+            List<Artist> artists = artistRepository.findAll();
+            for (Artist artist : artists) {
+                System.out.println("================ N+1 problem occur ================");
+                artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            }
 
-        // then
-        assertThat(artists.size()).isEqualTo(2);
-    }
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
 
-    @DisplayName("해결방안 2. EntityGraph")
-    @Test
-    @Transactional
-    void solveJpaNPlus1_EntityGraph() {
+        @DisplayName("해결방안 1. Fetch join")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_FetchJoin() {
 
-        // when
-        List<Artist> artists = artistRepository.findAllEntityGraph();
+            // when
+            List<Artist> artists = artistRepository.findAllJoinFetch();
+            for (Artist artist : artists) {
+                artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            }
 
-        // then
-        assertThat(artists.size()).isEqualTo(2);
-    }
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
 
-    @DisplayName("해결방안 3. FetchMode.SUBSELECT")
-    @Test
-    @Transactional
-    void solveJpaNPlus1_SUBSELECT() {
+        @DisplayName("해결방안 2. EntityGraph")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_EntityGraph() {
 
-        // when
-        List<Artist> artists = artistRepository.findAll();
+            // when
+            List<Artist> artists = artistRepository.findAllEntityGraph();
+            for (Artist artist : artists) {
+                artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            }
 
-        // then
-        assertThat(artists.size()).isEqualTo(2);
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
+
+        @DisplayName("해결방안 3. FetchMode.SUBSELECT")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_SUBSELECT() {
+
+            // when
+            List<Artist> artists = artistRepository.findAll();
+            for (Artist artist : artists) {
+                artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            }
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
+
+        @DisplayName("해결방안 4. BatchSize")
+        @Test
+        @Transactional
+        void solveJpaNPlus1_BATCHSIZE() {
+
+            // when
+            List<Artist> artists = artistRepository.findAll();
+            for (Artist artist : artists) {
+                artist.getSongs().forEach(song -> System.out.println(song.getTitle()));
+            }
+
+            // then
+            assertThat(artists.size()).isEqualTo(2);
+        }
     }
 }
