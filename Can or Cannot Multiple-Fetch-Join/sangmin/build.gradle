@@ -1,13 +1,10 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.7-SNAPSHOT'
+	id 'org.springframework.boot' version '3.0.8-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.1.0'
-
-	//Query dsl
-//	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
-group = 'sangmin'
+group = 'IssueSolving'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
@@ -34,7 +31,6 @@ dependencies {
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -46,7 +42,6 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
 
 // === QueryDsl 빌드 옵션 (선택) ===
 def querydslDir = "$buildDir/generated/querydsl"

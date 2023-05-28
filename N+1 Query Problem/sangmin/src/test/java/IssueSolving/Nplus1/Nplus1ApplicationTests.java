@@ -5,7 +5,6 @@ import IssueSolving.Nplus1.Entity.Member;
 import IssueSolving.Nplus1.Entity.QContract;
 import IssueSolving.Nplus1.Entity.QMember;
 import IssueSolving.Nplus1.QueryConuter.ApiQueryCounter;
-import IssueSolving.Nplus1.QueryConuter.ApiQueryInspector;
 import IssueSolving.Nplus1.Repository.ContractRepository;
 import IssueSolving.Nplus1.Repository.MemberRepository;
 
@@ -17,16 +16,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 class Nplus1ApplicationTests {
