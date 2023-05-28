@@ -10,11 +10,7 @@
 
 ### Prob 1. `MultipleBagFetchException` 이 언제 발생하는가
 
-Case 1. XXXToOne 연관관계가 두개 있는 엔티티에서 Multiple-Fetch-Join 했을때
-
-Case 2. XXXToOne 과 XXXToMany연관관계가 있는 엔티티에서 Multiple-Fetch-Join 했을때
-
-Case 3. XXXToMany 연관관계가 두개 있는 엔티티에서 Multiple-Fetch-Join 했을때
+Case 1. XXXToMany 연관관계가 두개 있는 엔티티에서 Multiple-Fetch-Join 했을때
 
 ### Ans 1. 가정한 이슈발생상황에서 이슈발생여부 판단
 

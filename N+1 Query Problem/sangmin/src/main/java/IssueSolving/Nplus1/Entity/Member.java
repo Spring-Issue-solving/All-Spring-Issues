@@ -1,10 +1,7 @@
 package IssueSolving.Nplus1.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -28,7 +25,7 @@ public class Member {
 
     // Case 1. 연관관계의 Fetch 전략이 즉시로딩
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    // Case 1. 연관관계의 Fetch 전략이 지연로딩
+    // Case 2. 연관관계의 Fetch 전략이 지연로딩
 //     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Contract> contracts = new ArrayList<>();
 
