@@ -1,4 +1,4 @@
-package com.spring.issuesolving.JpaNPlus1;
+package com.spring.issuesolving.JpaNPlus1.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
