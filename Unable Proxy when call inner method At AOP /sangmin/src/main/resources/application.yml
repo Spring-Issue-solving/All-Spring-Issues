@@ -1,0 +1,26 @@
+#logging.level:
+#  org.hibernate.SQL: debug
+#  org.hibernate.type: trace
+
+
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring_issues_db?serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create
+#    properties:
+#      hibernate.format_sql: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
