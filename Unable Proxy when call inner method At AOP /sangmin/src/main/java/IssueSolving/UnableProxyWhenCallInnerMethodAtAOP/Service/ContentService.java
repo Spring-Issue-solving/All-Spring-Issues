@@ -45,6 +45,7 @@ public class ContentService {
     }
 
 
+    // point 변경최소화
 //    //SOL 1
 //    private ContentService contentService;
 //
