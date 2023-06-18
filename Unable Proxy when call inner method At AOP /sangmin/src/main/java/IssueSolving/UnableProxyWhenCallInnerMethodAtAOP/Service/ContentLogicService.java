@@ -10,8 +10,6 @@ import java.util.UUID;
 @Service
 public class ContentLogicService {
 
-
-
     @ExecutionTimer
     public void modifyLogic(List<Content> contents) {
         contents.stream()
